@@ -1,4 +1,4 @@
-name: Build Shop APK
+name: Build Native Android APK
 
 on:
   push:
@@ -13,33 +13,110 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Java 17
+      - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
 
-      - name: Accept Android SDK Licenses
+      - name: Generate Native Android Project & Build
         run: |
-          yes | sudo $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          mkdir -p app/src/main/assets
+          mkdir -p app/src/main/java/com/myshop/app
+          mkdir -p app/src/main/res/values
 
-      - name: Build Android APK
-        run: |
-          npm install -g cordova
-          cordova create myapp com.myshop.app ShopApp
-          cd myapp
-          rm -rf www/*
-          cp -r ../www/* www/
-          cordova platform add android@12.0.1
-          cordova build android --debug
+          # کپی فایل HTML به پروژه
+          cp www/index.html app/src/main/assets/index.html
+
+          # ساخت فایل MainActivity
+          cat << 'EOF' > app/src/main/java/com/myshop/app/MainActivity.java
+          package com.myshop.app;
+          import android.app.Activity;
+          import android.os.Bundle;
+          import android.webkit.WebSettings;
+          import android.webkit.WebView;
+          import android.webkit.WebViewClient;
+
+          public class MainActivity extends Activity {
+              @Override
+              protected void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+                  WebView webView = new WebView(this);
+                  setContentView(webView);
+                  WebSettings ws = webView.getSettings();
+                  ws.setJavaScriptEnabled(true);
+                  ws.setDomStorageEnabled(true);
+                  ws.setDatabaseEnabled(true);
+                  ws.setAllowFileAccess(true);
+                  ws.setAllowContentAccess(true);
+                  webView.setWebViewClient(new WebViewClient());
+                  webView.loadUrl("file:///android_asset/index.html");
+              }
+          }
+          EOF
+
+          # ساخت فایل AndroidManifest
+          cat << 'EOF' > app/src/main/AndroidManifest.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.myshop.app">
+              <uses-permission android:name="android.permission.INTERNET" />
+              <application
+                  android:label="حسابداری مغازه"
+                  android:allowBackup="true"
+                  android:supportsRtl="true"
+                  android:theme="@android:style/Theme.NoTitleBar">
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true"
+                      android:configChanges="orientation|screenSize">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+                  </activity>
+              </application>
+          </manifest>
+          EOF
+
+          # تنظیمات Gradle
+          cat << 'EOF' > settings.gradle
+          include ':app'
+          EOF
+
+          cat << 'EOF' > build.gradle
+          buildscript {
+              repositories { google(); mavenCentral() }
+              dependencies { classpath 'com.android.tools.build:gradle:8.2.0' }
+          }
+          allprojects {
+              repositories { google(); mavenCentral() }
+          }
+          EOF
+
+          cat << 'EOF' > app/build.gradle
+          apply plugin: 'com.android.application'
+          android {
+              namespace 'com.myshop.app'
+              compileSdk 34
+              defaultConfig {
+                  applicationId "com.myshop.app"
+                  minSdk 21
+                  targetSdk 34
+                  versionCode 1
+                  versionName "1.0"
+              }
+          }
+          EOF
+
+          # بیلد نهایی APK
+          gradle wrapper --gradle-version 8.2
+          ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: ShopApp-APK
-          path: myapp/platforms/android/app/build/outputs/apk/debug/*.apk
+          path: app/build/outputs/apk/debug/app-debug.apk
