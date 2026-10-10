@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>صندوق فروش مغازه</title>
+<style>
+:root {
+  --p: #2563eb; --pd: #1d4ed8; --s: #10b981; --d: #ef4444;
+  --w: #f59e0b; --bg: #f1f5f9; --c: #fff; --t: #0f172a;
+  --tm: #64748b; --b: #e2e8f0; --r: 14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Vazirmatn','Tahoma',sans-serif;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--t);padding-bottom:85px;user-select:none}
+.hdr{background:linear-gradient(135deg,#1e40af,#3b82f6);color:#fff;padding:15px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 4px 15px rgba(37,99,235,.2)}
+.hdr h1{font-size:17px;font-weight:800}.hdr .badge{font-size:11px;background:rgba(255,255,255,.2);padding:4px 10px;border-radius:20px}
+.pg{display:none;padding:14px;max-width:500px;margin:0 auto}.pg.active{display:block;animation:fi .2s}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.cd{background:var(--c);border-radius:var(--r);padding:15px;margin-bottom:12px;border:1px solid var(--b);box-shadow:0 1px 4px rgba(0,0,0,.03)}
+.ct{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+input,select{width:100%;padding:11px 13px;border:1.5px solid var(--b);border-radius:10px;font-size:14px;margin-bottom:9px;background:#fff;outline:none;transition:.2s}
+input:focus,select:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.btn{display:flex;align-items:center;justify-content:center;gap:5px;width:100%;padding:12px;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:.12s}
+.btn:active{transform:scale(.97);opacity:.85}
+.bp{background:var(--p);color:#fff}.bs{background:var(--s);color:#fff}
+.bd{background:var(--d);color:#fff}.bw{background:var(--w);color:#fff}
+.bsm{padding:6px 10px;font-size:12px;width:auto;border-radius:8px}
+.bx{background:#f8fafc;color:var(--t);border:1px solid var(--b)}
+.btn-filter{background:#e2e8f0;color:var(--t);border-radius:8px;padding:8px;font-size:12px;font-weight:bold;border:none;cursor:pointer;flex:1}
+.btn-filter.active{background:var(--p);color:#fff}
+.sb{position:relative;margin-bottom:10px}
+.sr{background:#fff;border:1.5px solid var(--p);border-radius:10px;max-height:220px;overflow-y:auto;box-shadow:0 8px 20px rgba(0,0,0,.1);position:absolute;top:100%;left:0;right:0;z-index:50;display:none}
+.sr.show{display:block}
+.si{padding:11px 13px;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.si:active{background:#eff6ff}
+.ii{background:#f8fafc;border:1px solid var(--b);border-radius:10px;padding:11px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center}
+.tb{background:linear-gradient(135deg,#059669,#10b981);color:#fff;border-radius:var(--r);padding:15px;text-align:center;margin:12px 0;box-shadow:0 4px 12px rgba(16,185,129,.2)}
+.tb .v{font-size:22px;font-weight:900;margin-top:3px}
+.bb{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--b);display:flex;height:62px;z-index:100}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--tm);cursor:pointer;font-size:10px;font-weight:600}
+.ni.active{color:var(--p)}.ni .ic{font-size:19px}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(2px);display:none;align-items:flex-end;z-index:200}
+.mo.show{display:flex}
+.mc{background:#fff;width:100%;border-radius:20px 20px 0 0;padding:20px;animation:su .2s}
+@keyframes su{from{transform:translateY(100%)}to{transform:none}}
+.bg{padding:2px 7px;border-radius:5px;font-size:10px;font-weight:600}
+.bgk{background:#fef3c7;color:#b45309}.bgn{background:#dbeafe;color:#1e40af}
+.em{text-align:center;color:var(--tm);padding:30px 0;font-size:13px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>🏪 صندوق فروش مغازه</h1>
+  <div class="badge" id="hdrDate"></div>
+</div>
+
+<!-- ====== فاکتور ====== -->
+<div id="pg-inv" class="pg active">
+  <div class="cd">
+    <div class="ct">🔍 جستجو و افزودن کالا</div>
+    <div class="sb">
+      <input type="text" id="invQ" placeholder="نام کالا را تایپ کنید..." oninput="searchProd()" autocomplete="off">
+      <div id="invSR" class="sr"></div>
+    </div>
+  </div>
+  <div id="invList"></div>
+  <div id="invSum" style="display:none">
+    <div class="tb"><div style="font-size:12px;opacity:.9">جمع کل فاکتور</div><div class="v"><span id="totV">۰</span> <small style="font-size:13px">تومان</small></div></div>
+    <button class="btn bs" onclick="saveInv()">✅ ثبت نهایی فاکتور</button>
+  </div>
+</div>
+
+<!-- ====== انبار ====== -->
+<div id="pg-items" class="pg">
+  <div class="cd">
+    <div class="ct">➕ افزودن کالای جدید</div>
+    <input type="text" id="nName" placeholder="نام کالا">
+    <div class="row">
+      <input type="number" id="nPrice" placeholder="قیمت (تومان)">
+      <select id="nUnit"><option value="عدد">عدد</option><option value="کیلو">کیلوگرم</option><option value="بسته">بسته</option><option value="متر">متر</option><option value="لیتر">لیتر</option></select>
+    </div>
+    <button class="btn bp" onclick="addItem()">ذخیره در انبار</button>
+  </div>
+  <div class="cd">
+    <div class="ct">📦 لیست انبار (<span id="iCnt">۰</span>)</div>
+    <input type="text" id="iSearch" placeholder="جستجو..." oninput="renderItems()">
+    <div id="iList"></div>
+  </div>
+</div>
+
+<!-- ====== تاریخچه و گزارش ====== -->
+<div id="pg-hist" class="pg">
+  <div class="cd">
+    <div class="ct">📅 انتخاب بازه زمانی</div>
+    <!-- دکمه‌های سریع -->
+    <div class="row" style="margin-bottom:10px">
+      <button class="btn-filter active" id="btn-today" onclick="filterByQuick('today')">امروز</button>
+      <button class="btn-filter" id="btn-yesterday" onclick="filterByQuick('yesterday')">دیروز</button>
+      <button class="btn-filter" id="btn-all" onclick="filterByQuick('all')">همه روزها</button>
+    </div>
+    <!-- لیست تاریخ‌های ثبت‌شده -->
+    <label style="font-size:12px;color:var(--tm);display:block;margin-bottom:4px">یا انتخاب یک روز خاص از لیست:</label>
+    <select id="histDateSelect" onchange="onDateSelectChange(this.value)">
+      <option value="">-- انتخاب تاریخ ثبت شده --</option>
+    </select>
+  </div>
+
+  <div class="cd">
+    <div class="ct">📊 خلاصه عملکرد</div>
+    <div id="hSum" style="text-align:center;padding:10px;font-weight:700;color:var(--s);font-size:15px"></div>
+  </div>
+
+  <div id="hList"></div>
+</div>
+
+<!-- ====== بکاپ ====== -->
+<div id="pg-set" class="pg">
+  <div class="cd">
+    <div class="ct">💾 پشتیبان‌گیری</div>
+    <p style="font-size:12px;color:var(--tm);margin-bottom:10px;line-height:1.7">هفته‌ای یک‌بار فایل بکاپ را در گوشی ذخیره کنید:</p>
+    <button class="btn bp" onclick="dlBackup()">📥 دانلود فایل پشتیبان</button>
+  </div>
+  <div class="cd">
+    <div class="ct">♻️ بازیابی اطلاعات</div>
+    <input type="file" id="impF" accept=".json" onchange="impBackup(event)">
+  </div>
+  <div class="cd">
+    <div class="ct">🔤 وضعیت فونت فارسی</div>
+    <p id="fontStatus" style="font-size:12px;color:var(--tm)"></p>
+  </div>
+</div>
+
+<!-- مودال مقدار -->
+<div id="qtyM" class="mo">
+  <div class="mc">
+    <h3 id="mName" style="font-size:15px;margin-bottom:10px"></h3>
+    <label id="mLabel" style="font-size:12px;color:var(--tm)"></label>
+    <input type="number" id="mQty" step="any" style="font-size:18px;text-align:center;font-weight:700;margin-top:5px">
+    <div class="row" style="margin-top:8px">
+      <button class="btn bp" onclick="confirmQty()">تایید</button>
+      <button class="btn bd" onclick="closeM()">انصراف</button>
+    </div>
+  </div>
+</div>
+
+<!-- مودال ویرایش کالا -->
+<div id="editItemM" class="mo">
+  <div class="mc">
+    <h3 style="font-size:15px;margin-bottom:10px">✏️ ویرایش کالا</h3>
+    <input type="text" id="eiName" placeholder="نام کالا">
+    <div class="row">
+      <input type="number" id="eiPrice" placeholder="قیمت">
+      <select id="eiUnit"><option value="عدد">عدد</option><option value="کیلو">کیلوگرم</option><option value="بسته">بسته</option><option value="متر">متر</option><option value="لیتر">لیتر</option></select>
+    </div>
+    <div class="row" style="margin-top:5px">
+      <button class="btn bs" onclick="saveEditItem()">ذخیره تغییرات</button>
+      <button class="btn bd" onclick="closeEditItem()">انصراف</button>
+    </div>
+  </div>
+</div>
+
+<!-- مودال ویرایش فاکتور -->
+<div id="editInvM" class="mo">
+  <div class="mc" style="max-height:85vh;overflow-y:auto">
+    <h3 style="font-size:15px;margin-bottom:10px">✏️ ویرایش فاکتور</h3>
+    <div id="eiInvList"></div>
+    <div style="margin-top:10px">
+      <div class="sb">
+        <input type="text" id="eiInvQ" placeholder="افزودن کالای جدید به فاکتور..." oninput="searchProdForEdit()">
+        <div id="eiInvSR" class="sr"></div>
+      </div>
+    </div>
+    <div id="eiInvTotal" style="text-align:center;font-weight:700;color:var(--s);padding:8px"></div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn bs" onclick="saveEditInv()">ذخیره فاکتور</button>
+      <button class="btn bd" onclick="closeEditInv()">انصراف</button>
+    </div>
+  </div>
+</div>
+
+<!-- نوار پایین -->
+<div class="bb">
+  <div class="ni active" onclick="go('inv',this)"><span class="ic">🧾</span>فاکتور</div>
+  <div class="ni" onclick="go('items',this)"><span class="ic">📦</span>انبار</div>
+  <div class="ni" onclick="go('hist',this)"><span class="ic">📊</span>گزارش</div>
+  <div class="ni" onclick="go('set',this)"><span class="ic">⚙️</span>بکاپ</div>
+</div>
+
+<script>
+// ===== فونت محلی آفلاین =====
+async function loadLocalFont(){
+  const ck=localStorage.getItem('vz_font');
+  if(ck){injectFont(ck);updFontSt('✅ فونت وزیرمتن در حافظه گوشی فعال است (کاملاً آفلاین)');return}
+  updFontSt('⏳ در حال دریافت فونت...');
+  try{
+    const r=await fetch('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn-Regular.woff2');
+    const b=await r.blob();const rd=new FileReader();
+    rd.onload=()=>{localStorage.setItem('vz_font',rd.result);injectFont(rd.result);updFontSt('✅ فونت با موفقیت ذخیره شد')};
+    rd.readAsDataURL(b);
+  }catch(e){updFontSt('⚠️ در حالت آفلاین، فونت پیش‌فرض لود می‌شود.')}
+}
+function injectFont(d){const s=document.createElement('style');s.textContent=`@font-face{font-family:'Vazirmatn';src:url(${d}) format('woff2');font-weight:100 900}`;document.head.prepend(s)}
+function updFontSt(t){const e=document.getElementById('fontStatus');if(e)e.textContent=t}
+loadLocalFont();
+
+// ===== محاسبات تاریخ و اعداد =====
+const toFa=n=>Number(n||0).toLocaleString('fa-IR');
+
+function getJalaliDateOffset(offsetDays = 0) {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  return new Intl.DateTimeFormat('fa-IR', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
+}
+function jDateFull(){return new Intl.DateTimeFormat('fa-IR',{dateStyle:'full'}).format(new Date())}
+document.getElementById('hdrDate').textContent=jDateFull();
+
+let items=JSON.parse(localStorage.getItem('sh_items')||'[]');
+let invs=JSON.parse(localStorage.getItem('sh_invs')||'[]');
+let curInv=[];
+let selItem=null;
+let editItemId=null;
+let editInvId=null;
+let editInvItems=[];
+let currentFilterDate = getJalaliDateOffset(0); // پیش‌فرض: امروز
+
+function save(){localStorage.setItem('sh_items',JSON.stringify(items));localStorage.setItem('sh_invs',JSON.stringify(invs))}
+
+function go(id,el){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  document.getElementById('pg-'+id).classList.add('active');
+  el.classList.add('active');
+  if(id==='items')renderItems();
+  if(id==='hist'){
+    populateDateDropdown();
+    renderHist();
+  }
+}
+
+// ===== انبار =====
+function addItem(){
+  const n=document.getElementById('nName').value.trim(),p=parseFloat(document.getElementById('nPrice').value),u=document.getElementById('nUnit').value;
+  if(!n||!p)return alert('نام و قیمت لازم است');
+  items.push({id:Date.now(),name:n,price:p,unit:u});save();
+  document.getElementById('nName').value='';document.getElementById('nPrice').value='';
+  renderItems();
+}
+function openEditItem(id){
+  editItemId=id;const it=items.find(i=>i.id===id);
+  document.getElementById('eiName').value=it.name;
+  document.getElementById('eiPrice').value=it.price;
+  document.getElementById('eiUnit').value=it.unit;
+  document.getElementById('editItemM').classList.add('show');
+}
+function closeEditItem(){document.getElementById('editItemM').classList.remove('show');editItemId=null}
+function saveEditItem(){
+  const it=items.find(i=>i.id===editItemId);if(!it)return;
+  const n=document.getElementById('eiName').value.trim(),p=parseFloat(document.getElementById('eiPrice').value),u=document.getElementById('eiUnit').value;
+  if(!n||!p)return alert('نام و قیمت لازم است');
+  it.name=n;it.price=p;it.unit=u;save();closeEditItem();renderItems();
+}
+function delItem(id){if(!confirm('کالا حذف شود؟'))return;items=items.filter(i=>i.id!==id);save();renderItems()}
+function renderItems(){
+  const q=(document.getElementById('iSearch')?.value||'').trim().toLowerCase();
+  const f=items.filter(i=>i.name.toLowerCase().includes(q));
+  document.getElementById('iCnt').textContent=toFa(items.length);
+  const c=document.getElementById('iList');
+  if(!f.length){c.innerHTML='<div class="em">کالایی یافت نشد</div>';return}
+  c.innerHTML=f.map(i=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--b)">
+      <div><div style="font-weight:700;font-size:13px">${i.name}</div>
+      <div style="font-size:11px;color:var(--tm)">${toFa(i.price)} ت / <span class="bg ${i.unit==='کیلو'?'bgk':'bgn'}">${i.unit}</span></div></div>
+      <div style="display:flex;gap:4px">
+        <button class="btn bw bsm" onclick="openEditItem(${i.id})">✏️</button>
+        <button class="btn bd bsm" onclick="delItem(${i.id})">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+// ===== صدور فاکتور =====
+function searchProd(){
+  const q=document.getElementById('invQ').value.trim().toLowerCase(),r=document.getElementById('invSR');
+  if(!q){r.classList.remove('show');return}
+  const f=items.filter(i=>i.name.toLowerCase().includes(q));
+  if(!f.length){r.classList.remove('show');return}
+  r.classList.add('show');
+  r.innerHTML=f.map(i=>`<div class="si" onclick="openQty(${i.id})"><span style="font-weight:600">${i.name}</span><span style="color:var(--s);font-weight:700;font-size:12px">${toFa(i.price)} ت (${i.unit})</span></div>`).join('');
+}
+function openQty(id){
+  selItem=items.find(i=>i.id===id);
+  document.getElementById('invSR').classList.remove('show');document.getElementById('invQ').value='';
+  document.getElementById('mName').textContent=selItem.name;
+  document.getElementById('mLabel').textContent='مقدار بر حسب '+selItem.unit+':';
+  document.getElementById('mQty').value='1';
+  document.getElementById('qtyM').classList.add('show');
+  setTimeout(()=>document.getElementById('mQty').focus(),100);
+}
+function closeM(){document.getElementById('qtyM').classList.remove('show');selItem=null}
+function confirmQty(){
+  const q=parseFloat(document.getElementById('mQty').value);
+  if(!q||q<=0)return alert('مقدار نامعتبر');
+  curInv.push({...selItem,qty:q,total:q*selItem.price});closeM();renderInv();
+}
+function rmInv(i){curInv.splice(i,1);renderInv()}
+function renderInv(){
+  const c=document.getElementById('invList'),s=document.getElementById('invSum');
+  if(!curInv.length){c.innerHTML='<div class="em">فاکتور خالی است</div>';s.style.display='none';return}
+  let t=0;
+  c.innerHTML=curInv.map((it,i)=>{t+=it.total;return`
+    <div class="ii"><div><div style="font-weight:700;font-size:13px">${it.name}</div>
+    <div style="font-size:11px;color:var(--tm)">${toFa(it.qty)} ${it.unit} × ${toFa(it.price)}</div></div>
+    <div style="display:flex;align-items:center;gap:8px"><span style="font-weight:800;color:var(--s);font-size:13px">${toFa(it.total)} ت</span>
+    <button style="background:#fee2e2;color:var(--d);border:none;border-radius:8px;width:30px;height:30px;font-size:13px;cursor:pointer" onclick="rmInv(${i})">✕</button></div></div>`}).join('');
+  document.getElementById('totV').textContent=toFa(t);s.style.display='block';
+}
+function saveInv(){
+  if(!curInv.length)return;
+  const t=curInv.reduce((s,i)=>s+i.total,0),now=new Date();
+  invs.push({
+    id:Date.now(),
+    date: getJalaliDateOffset(0),
+    time: now.toLocaleTimeString('fa-IR',{hour:'2-digit',minute:'2-digit'}),
+    items:[...curInv],
+    total:t
+  });
+  save();curInv=[];renderInv();alert('✅ فاکتور با موفقیت ثبت شد');
+}
+
+// ===== بخش تاریخچه با فیلتر روزهای دلخواه =====
+function populateDateDropdown(){
+  const select = document.getElementById('histDateSelect');
+  const uniqueDates = [...new Set(invs.map(i => i.date))].sort().reverse();
+  select.innerHTML = '<option value="">-- لیست همه تاریخ‌های موجود --</option>';
+  uniqueDates.forEach(d => {
+    const count = invs.filter(i => i.date === d).length;
+    select.innerHTML += `<option value="${d}">${d} (${toFa(count)} فاکتور)</option>`;
+  });
+}
+
+function filterByQuick(type) {
+  document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
+  document.getElementById('histDateSelect').value = '';
+
+  if (type === 'today') {
+    document.getElementById('btn-today').classList.add('active');
+    currentFilterDate = getJalaliDateOffset(0);
+  } else if (type === 'yesterday') {
+    document.getElementById('btn-yesterday').classList.add('active');
+    currentFilterDate = getJalaliDateOffset(-1);
+  } else if (type === 'all') {
+    document.getElementById('btn-all').classList.add('active');
+    currentFilterDate = 'ALL';
+  }
+  renderHist();
+}
+
+function onDateSelectChange(val) {
+  if (!val) return;
+  document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
+  currentFilterDate = val;
+  renderHist();
+}
+
+function renderHist(){
+  const c = document.getElementById('hList');
+  const sumEl = document.getElementById('hSum');
+
+  let filtered = [];
+  let title = '';
+
+  if (currentFilterDate === 'ALL') {
+    filtered = [...invs];
+    title = 'کل فروش ثبت‌شده (همه روزها)';
+  } else {
+    filtered = invs.filter(i => i.date === currentFilterDate);
+    const isToday = (currentFilterDate === getJalaliDateOffset(0));
+    const isYesterday = (currentFilterDate === getJalaliDateOffset(-1));
+    title = isToday ? 'فروش امروز (' + currentFilterDate + ')' :
+            isYesterday ? 'فروش دیروز (' + currentFilterDate + ')' :
+            'فروش روز ' + currentFilterDate;
+  }
+
+  const totalSum = filtered.reduce((s, i) => s + i.total, 0);
+  sumEl.innerHTML = `${title}: <br><span style="font-size:18px;font-weight:900">${toFa(totalSum)} تومان</span> <span style="font-size:12px;color:var(--tm)">(${toFa(filtered.length)} فاکتور)</span>`;
+
+  if (!filtered.length) {
+    c.innerHTML = '<div class="em">فاکتوری برای این تاریخ یافت نشد</div>';
+    return;
+  }
+
+  c.innerHTML = [...filtered].reverse().map(inv => `
+    <div class="cd" style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-weight:700;margin-bottom:4px">
+        <span>🧾 #${inv.id.toString().slice(-4)}</span><span style="color:var(--s)">${toFa(inv.total)} ت</span>
+      </div>
+      <div style="font-size:11px;color:var(--tm);display:flex;justify-content:space-between;margin-bottom:6px">
+        <span>📅 ${inv.date} ⏰ ${inv.time}</span><span>${toFa(inv.items.length)} قلم</span>
+      </div>
+      <div style="font-size:12px;border-top:1px dashed var(--b);padding-top:6px">
+        ${inv.items.map(it=>`<div style="display:flex;justify-content:space-between;padding:2px 0"><span>${it.name} (${toFa(it.qty)} ${it.unit})</span><span>${toFa(it.total)} ت</span></div>`).join('')}
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button class="btn bw bsm" onclick="openEditInv(${inv.id})" style="flex:1">✏️ ویرایش فاکتور</button>
+        <button class="btn bd bsm" onclick="delInv(${inv.id})" style="flex:1">🗑 حذف</button>
+      </div>
+    </div>`).join('');
+}
+
+function delInv(id){
+  if(!confirm('فاکتور حذف شود؟'))return;
+  invs = invs.filter(i => i.id !== id);
+  save();
+  populateDateDropdown();
+  renderHist();
+}
+
+// ===== ویرایش فاکتور =====
+function openEditInv(id){
+  editInvId=id;const inv=invs.find(i=>i.id===id);
+  editInvItems=JSON.parse(JSON.stringify(inv.items));
+  renderEditInv();
+  document.getElementById('editInvM').classList.add('show');
+}
+function closeEditInv(){document.getElementById('editInvM').classList.remove('show');editInvId=null;editInvItems=[]}
+function renderEditInv(){
+  const c=document.getElementById('eiInvList');
+  let t=0;
+  c.innerHTML=editInvItems.map((it,i)=>{t+=it.total;return`
+    <div class="ii" style="flex-wrap:wrap">
+      <div style="flex:1"><div style="font-weight:700;font-size:13px">${it.name}</div>
+      <div style="font-size:11px;color:var(--tm)">${toFa(it.price)} ت / ${it.unit}</div></div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <input type="number" step="any" value="${it.qty}" style="width:70px;text-align:center;padding:6px;margin:0;font-size:13px" onchange="updEditQty(${i},this.value)">
+        <span style="font-size:11px;color:var(--tm)">${it.unit}</span>
+        <span style="font-weight:700;color:var(--s);font-size:12px;min-width:60px;text-align:left">${toFa(it.total)} ت</span>
+        <button style="background:#fee2e2;color:var(--d);border:none;border-radius:6px;width:26px;height:26px;font-size:12px;cursor:pointer" onclick="rmEditItem(${i})">✕</button>
+      </div>
+    </div>`}).join('');
+  document.getElementById('eiInvTotal').textContent='جمع جدید: '+toFa(t)+' تومان';
+}
+function updEditQty(i,v){
+  const q=parseFloat(v);if(!q||q<=0)return;
+  editInvItems[i].qty=q;editInvItems[i].total=q*editInvItems[i].price;renderEditInv();
+}
+function rmEditItem(i){editInvItems.splice(i,1);renderEditInv()}
+function searchProdForEdit(){
+  const q=document.getElementById('eiInvQ').value.trim().toLowerCase(),r=document.getElementById('eiInvSR');
+  if(!q){r.classList.remove('show');return}
+  const f=items.filter(i=>i.name.toLowerCase().includes(q));
+  if(!f.length){r.classList.remove('show');return}
+  r.classList.add('show');
+  r.innerHTML=f.map(i=>`<div class="si" onclick="addEditItem(${i.id})"><span style="font-weight:600">${i.name}</span><span style="color:var(--s);font-size:12px">${toFa(i.price)} ت</span></div>`).join('');
+}
+function addEditItem(id){
+  const it=items.find(i=>i.id===id);
+  const q=parseFloat(prompt('مقدار ('+it.unit+'):','1'));
+  if(!q||q<=0)return;
+  editInvItems.push({...it,qty:q,total:q*it.price});
+  document.getElementById('eiInvQ').value='';document.getElementById('eiInvSR').classList.remove('show');
+  renderEditInv();
+}
+function saveEditInv(){
+  const inv=invs.find(i=>i.id===editInvId);if(!inv)return;
+  inv.items=editInvItems;inv.total=editInvItems.reduce((s,i)=>s+i.total,0);
+  save();closeEditInv();renderHist();alert('✅ فاکتور ویرایش و ذخیره شد');
+}
+
+// ===== بکاپ =====
+function dlBackup(){
+  const d=JSON.stringify({items,invs},null,2),b=new Blob([d],{type:'application/json'}),a=document.createElement('a');
+  a.href=URL.createObjectURL(b);a.download='shop_backup_'+Date.now()+'.json';a.click();
+}
+function impBackup(e){
+  const f=e.target.files[0];if(!f)return;const r=new FileReader();
+  r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(d.items&&d.invs){items=d.items;invs=d.invs;save();alert('✅ بازیابی شد');location.reload()}}catch{alert('فایل نامعتبر')}};
+  r.readAsText(f);
+}
+
+renderInv();
+</script>
+</body>
+</html>
