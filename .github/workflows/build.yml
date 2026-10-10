@@ -22,14 +22,15 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: '20'
 
-      - name: Install Cordova
-        run: npm install -g cordova
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
-      - name: Build Android APK
+      - name: Build APK with Cordova
         run: |
-          cordova create myapp com.myshop.app "حسابداری مغازه"
+          npm install -g cordova
+          cordova create myapp com.myshop.app ShopApp
           cd myapp
           rm -rf www/*
           cp -r ../www/* www/
